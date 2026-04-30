@@ -8,9 +8,13 @@ import org.kie.api.runtime.KieSession;
 import org.kie.internal.io.ResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,12 +32,14 @@ public class DroolsServiceImpl implements DroolsService {
 	/**
 	 * 存储规则的磁盘根路径，可通过SpringBoot的配置文件来配置，以区分不同环境。
 	 */
-	private static final String RULES_PATH = "/Users/zzs/temp/rules";
+	// private static final String RULES_PATH = "/Users/zzs/temp/rules";
+	private static final String RULES_PATH = "rules/";
 
 	private static final KieServices KIE_SERVICES = KieServices.get();
 
 	private static volatile KieContainer KIE_CONTAINER = null;
 
+	// DCL 单例模式
 	@Override
 	public KieContainer getKieContainer() {
 		if (KIE_CONTAINER == null) {
@@ -103,4 +109,8 @@ public class DroolsServiceImpl implements DroolsService {
 	}
 
 
+	private Resource[] getClassPathRuleFiles() throws IOException {
+		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+		return resourcePatternResolver.getResources("classpath*:" + RULES_PATH + "**/*.*");
+	}
 }
